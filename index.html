@@ -27,7 +27,9 @@
             font-family: 'Vazirmatn', sans-serif;
             direction: rtl;
             min-height: 100vh;
-            background: linear-gradient(135deg, #020c18 0%, #0a192f 30%, #0d3b6e 60%, #041428 100%);
+            /* background: linear-gradient(135deg, #020c18 0%, #0a192f 30%, #0d3b6e 60%, #041428 100%); */
+            background: url(MARINA.png);
+
             color: #fff;
             overflow-x: hidden;
             position: relative;
@@ -371,6 +373,13 @@
             to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+
+        @media only screen and (max-width: 600px) {
+            body {
+                background-position: center center;
+                background-size: cover;
             }
         }
     </style>
