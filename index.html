@@ -1,478 +1,649 @@
 <!DOCTYPE html>
 <html lang="fa">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MARINA SERVICE</title>
+    <title>BLUE HORIZON | Digital Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Vazirmatn:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;900&display=swap');
-
         :root {
-            --neon-blue: #00d4ff;
-            --ocean-deep: #0a192f;
-            --ocean-mid: #0d2d4a;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(0, 212, 255, 0.25);
-            --glow: rgba(0, 212, 255, 0.6);
+            --neon: #00d4ff;
+            --neon2: #0077ff;
+            --neon3: #00ffcc;
+            --deep: #040d1a;
+            --mid: #071428;
+            --glass: rgba(7, 20, 42, 0.7);
+            --glass2: rgba(0, 212, 255, 0.06);
+            --border: rgba(0, 212, 255, 0.25);
+            --border-hot: rgba(0, 212, 255, 0.8);
+            --text: #c8e6f0;
+            --text-dim: #5a8a9f;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Vazirmatn', sans-serif;
+            font-family: 'Vazirmatn', 'Segoe UI', sans-serif;
             direction: rtl;
-            min-height: 100vh;
-            /* background: linear-gradient(135deg, #020c18 0%, #0a192f 30%, #0d3b6e 60%, #041428 100%); */
-            background: url(MARINA.png);
-
+            background: var(--deep);
             color: #fff;
+            min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
         }
 
-        /* Ocean animated background */
-        body::before {
-            content: '';
+        /* ── ANIMATED BACKGROUND ── */
+        .bg-layer {
             position: fixed;
             inset: 0;
+            z-index: 0;
             background:
-                radial-gradient(ellipse at 20% 50%, rgba(0, 100, 200, 0.15) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse at 60% 80%, rgba(0, 50, 150, 0.2) 0%, transparent 50%);
-            animation: oceanPulse 8s ease-in-out infinite alternate;
-            z-index: 0;
+                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,119,255,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 100%, rgba(0,212,255,0.12) 0%, transparent 55%),
+                linear-gradient(170deg, #040d1a 0%, #061525 50%, #030b15 100%);
         }
 
-        body::after {
+        .bg-layer::after {
             content: '';
-            position: fixed;
+            position: absolute;
             inset: 0;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-            z-index: 0;
-            pointer-events: none;
+            background: url(marina.png) center/cover no-repeat;
+            opacity: 0.08;
+            mix-blend-mode: screen;
         }
 
-        @keyframes oceanPulse {
-            0% {
-                opacity: 0.7;
-                transform: scale(1);
-            }
-
-            100% {
-                opacity: 1;
-                transform: scale(1.05);
-            }
-        }
-
-        /* Floating particles */
+        /* floating particles */
         .particles {
             position: fixed;
             inset: 0;
             z-index: 0;
-            pointer-events: none;
             overflow: hidden;
+            pointer-events: none;
         }
 
         .particle {
             position: absolute;
             border-radius: 50%;
-            background: rgba(0, 212, 255, 0.4);
-            animation: floatUp linear infinite;
+            animation: float linear infinite;
         }
 
-        @keyframes floatUp {
-            0% {
-                transform: translateY(100vh) scale(0);
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 1;
-            }
-
-            90% {
-                opacity: 0.5;
-            }
-
-            100% {
-                transform: translateY(-10vh) scale(1);
-                opacity: 0;
-            }
+        @keyframes float {
+            0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+            10%  { opacity: 1; }
+            90%  { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
         }
 
-        /* Waves at bottom */
-        .waves {
+        /* grid lines */
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* wave bottom */
+        .wave-svg {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             z-index: 0;
-            pointer-events: none;
+            opacity: 0.18;
         }
 
+        /* ── LAYOUT ── */
         .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 50px 20px 20px;
             position: relative;
-            z-index: 1;
+            z-index: 2;
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 60px 20px 80px;
         }
 
-        /* HEADER */
+        /* ── HEADER ── */
         header {
             text-align: center;
             margin-bottom: 60px;
+            animation: fadeInDown 1s ease both;
         }
 
-        .logo-wrap {
+        .logo-ring {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 20px;
             position: relative;
-            display: inline-block;
-            margin-bottom: 15px;
+        }
+
+        .logo-ring svg {
+            width: 100%;
+            height: 100%;
+            animation: spin 12s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .logo-ring-inner {
+            position: absolute;
+            inset: 15px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,212,255,0.2), rgba(0,119,255,0.1));
+            border: 1px solid rgba(0,212,255,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
         }
 
         .logo-text {
-            font-size: clamp(36px, 6vw, 62px);
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(26px, 7vw, 52px);
             font-weight: 900;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #000000, #0200ff, #ffffff);
-            background-size: 200% auto;
+            background: linear-gradient(135deg, #ffffff 0%, var(--neon) 50%, var(--neon3) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shimmer 3s linear infinite;
-            filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.8));
-        }
-
-        @keyframes shimmer {
-            0% {
-                background-position: 0% center;
-            }
-
-            100% {
-                background-position: 200% center;
-            }
-        }
-
-        .logo-line {
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
-            margin: 10px auto;
-            width: 70%;
-            animation: expandLine 1.5s ease forwards;
-        }
-
-        @keyframes expandLine {
-            from {
-                width: 0;
-            }
-
-            to {
-                width: 70%;
-            }
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            filter: drop-shadow(0 0 20px rgba(0,212,255,0.5));
+            line-height: 1.1;
         }
 
         .sub-logo {
-            font-size: 13px;
-            letter-spacing: 3px;
-            color: rgba(174, 244, 255, 0.75);
+            font-size: 11px;
+            letter-spacing: 4px;
+            color: rgba(0,212,255,0.6);
+            margin-top: 12px;
             text-transform: uppercase;
         }
 
-        /* GLASS BADGE */
-        .header-badge {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 8px 24px;
-            background: rgba(0, 212, 255, 0.08);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 30px;
-            font-size: 12px;
-            letter-spacing: 2px;
-            color: var(--neon-blue);
-            backdrop-filter: blur(10px);
+        .header-divider {
+            width: 120px;
+            height: 2px;
+            margin: 18px auto 0;
+            background: linear-gradient(90deg, transparent, var(--neon), transparent);
+            border-radius: 2px;
+            box-shadow: 0 0 12px var(--neon);
         }
 
-        /* ACCORDION */
+        /* ── ACCORDION ── */
         .accordion-item {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 212, 255, 0.18);
-            border-radius: 18px;
-            margin-bottom: 14px;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: fadeSlideIn 0.7s ease both;
             position: relative;
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+            animation: fadeInUp 0.6s ease both;
+            opacity: 0;
         }
 
-        /* inner top shine */
+        /* top glow edge */
         .accordion-item::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 10%;
-            right: 10%;
+            top: 0; left: 0; right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            border-radius: 50%;
+            background: linear-gradient(90deg, transparent 0%, rgba(0,212,255,0.6) 50%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s;
         }
 
+        /* left accent bar */
+        .accordion-item::after {
+            content: '';
+            position: absolute;
+            right: 0; top: 20%; bottom: 20%;
+            width: 3px;
+            background: linear-gradient(180deg, transparent, var(--neon), transparent);
+            border-radius: 3px 0 0 3px;
+            opacity: 0;
+            transition: opacity 0.4s, top 0.4s, bottom 0.4s;
+        }
+
+        .accordion-item:hover::before,
+        .accordion-item.active::before { opacity: 1; }
+
+        .accordion-item:hover::after,
+        .accordion-item.active::after { opacity: 1; top: 10%; bottom: 10%; }
+
         .accordion-item:hover {
-            border-color: rgba(0, 212, 255, 0.5);
+            border-color: rgba(0,212,255,0.5);
             box-shadow:
-                0 8px 32px rgba(0, 212, 255, 0.15),
-                0 2px 8px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.07);
-            transform: translateY(-2px);
+                0 0 0 1px rgba(0,212,255,0.1),
+                0 12px 40px rgba(0,50,80,0.5),
+                0 0 60px rgba(0,212,255,0.05);
+            transform: translateY(-3px);
         }
 
         .accordion-item.active {
-            border-color: rgba(0, 212, 255, 0.45);
+            border-color: rgba(0,212,255,0.6);
+            background: rgba(7, 22, 50, 0.85);
             box-shadow:
-                0 12px 40px rgba(0, 212, 255, 0.2),
-                0 4px 12px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                0 0 0 1px rgba(0,212,255,0.2),
+                0 16px 50px rgba(0,50,100,0.5),
+                0 0 80px rgba(0,212,255,0.08),
+                inset 0 1px 0 rgba(0,212,255,0.1);
+            transform: translateY(-4px);
         }
 
+        /* ── HEADER ROW ── */
         .accordion-header {
-            padding: 20px 28px;
+            padding: 20px 24px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 1.1rem;
-            font-weight: 600;
-            background: transparent;
+            gap: 12px;
             user-select: none;
-            gap: 10px;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
+            flex: 1;
+            min-width: 0;
         }
 
-        .icon-wrap {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 100, 200, 0.15));
-            border: 1px solid rgba(0, 212, 255, 0.3);
+        .icon-box {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,119,255,0.08));
+            border: 1px solid rgba(0,212,255,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            transition: all 0.4s ease;
+            overflow: hidden;
+        }
+
+        .icon-box::before {
+            content: '';
+            position: absolute;
+            inset: -40%;
+            background: conic-gradient(from 0deg, transparent 60%, rgba(0,212,255,0.4) 80%, transparent 100%);
+            animation: rotateBorder 3s linear infinite paused;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .accordion-item:hover .icon-box::before,
+        .accordion-item.active .icon-box::before {
+            opacity: 1;
+            animation-play-state: running;
+        }
+
+        @keyframes rotateBorder { to { transform: rotate(360deg); } }
+
+        .icon-box-inner {
+            position: relative;
+            z-index: 1;
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            background: rgba(4, 13, 26, 0.8);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
+            transition: transform 0.3s;
+        }
+
+        .accordion-item:hover .icon-box-inner { transform: scale(1.1); }
+
+        .header-info { flex: 1; min-width: 0; }
+
+        .header-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #ddf0f7;
+            line-height: 1.3;
+        }
+
+        .header-count {
+            font-size: 11px;
+            color: rgba(0,212,255,0.5);
+            margin-top: 3px;
+            letter-spacing: 1px;
+        }
+
+        /* ── ARROW ── */
+        .arrow-wrap {
+            width: 32px;
+            height: 32px;
             flex-shrink: 0;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
-        }
-
-        .accordion-item.active .icon-wrap,
-        .accordion-item:hover .icon-wrap {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.35), rgba(0, 100, 200, 0.25));
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-        }
-
-        .arrow {
-            width: 28px;
-            height: 28px;
             border-radius: 50%;
-            border: 1px solid rgba(0, 212, 255, 0.3);
+            border: 1px solid rgba(0,212,255,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
-            color: var(--neon-blue);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            flex-shrink: 0;
-            background: rgba(0, 212, 255, 0.05);
+            transition: all 0.4s ease;
+            background: rgba(0,212,255,0.05);
         }
 
-        .accordion-item.active .arrow {
-            transform: rotate(180deg);
-            background: rgba(0, 212, 255, 0.15);
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        .accordion-item.active .arrow-wrap {
+            border-color: rgba(0,212,255,0.6);
+            background: rgba(0,212,255,0.12);
+            box-shadow: 0 0 14px rgba(0,212,255,0.25);
         }
 
-        /* Content */
+        .arrow {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid var(--neon);
+            transition: transform 0.4s cubic-bezier(0.23,1,0.32,1);
+            filter: drop-shadow(0 0 4px var(--neon));
+        }
+
+        .accordion-item.active .arrow { transform: rotate(180deg); }
+
+        /* ── CONTENT ── */
         .accordion-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: max-height 0.55s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .accordion-item.active .accordion-content {
-            max-height: 600px;
-        }
+        .accordion-item.active .accordion-content { max-height: 700px; }
 
         .content-inner {
-            padding: 4px 28px 22px;
-            border-top: 1px solid rgba(0, 212, 255, 0.1);
+            padding: 0 24px 24px;
         }
 
+        .content-separator {
+            height: 1px;
+            background: linear-gradient(90deg, rgba(0,212,255,0.2), transparent);
+            margin-bottom: 18px;
+        }
+
+        /* ── LIST ITEMS ── */
         .accordion-content ul {
             list-style: none;
-            padding: 0;
-            margin: 0;
         }
 
         .accordion-content li {
-            padding: 11px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            color: rgba(200, 235, 255, 0.85);
             display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.95rem;
-            transition: color 0.2s;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 11px 0;
+            color: #8fb8c8;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: color 0.3s, padding-right 0.3s;
+            animation: slideInItem 0.4s ease both;
         }
 
         .accordion-content li:hover {
-            color: #fff;
+            color: #cde8f4;
+            padding-right: 6px;
         }
 
-        .accordion-content li:last-child {
-            border-bottom: none;
-        }
+        .accordion-content li:last-child { border-bottom: none; }
 
         .li-dot {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            border-radius: 50%;
+            background: rgba(0,212,255,0.1);
+            border: 1px solid rgba(0,212,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .li-dot::after {
+            content: '';
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: var(--neon-blue);
-            box-shadow: 0 0 8px var(--neon-blue);
-            flex-shrink: 0;
+            background: var(--neon);
+            box-shadow: 0 0 6px var(--neon);
         }
 
-        /* FOOTER */
+        /* progress bar inside active */
+        .progress-bar {
+            height: 2px;
+            background: rgba(0,212,255,0.1);
+            border-radius: 2px;
+            margin-bottom: 18px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--neon2), var(--neon), var(--neon3));
+            border-radius: 2px;
+            transition: width 0.8s ease 0.2s;
+            box-shadow: 0 0 8px var(--neon);
+        }
+
+        .accordion-item.active .progress-fill { width: 100%; }
+
+        @keyframes slideInItem {
+            from { opacity: 0; transform: translateX(-10px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ── FOOTER ── */
         footer {
             text-align: center;
-            padding: 40px 20px 100px;
+            margin-top: 60px;
             font-size: 11px;
-            letter-spacing: 2px;
-            color: rgba(174, 244, 255, 0.4);
+            color: rgba(0,212,255,0.3);
+            letter-spacing: 3px;
             text-transform: uppercase;
-            position: relative;
-            z-index: 1;
+            animation: fadeInUp 1s ease 0.8s both;
         }
 
-        @keyframes fadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(24px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .footer-line {
+            width: 200px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,212,255,0.3), transparent);
+            margin: 0 auto 16px;
         }
 
-        @media only screen and (max-width: 600px) {
-            body {
-                background-position: center center;
-                background-size: cover;
-            }
+        /* ── ANIMATIONS ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--deep); }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0,212,255,0.3);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.6); }
     </style>
 </head>
-
 <body>
 
-    <!-- Particles -->
-    <div class="particles" id="particles"></div>
+<div class="bg-layer"></div>
+<div class="grid-overlay"></div>
+<div class="particles" id="particles"></div>
 
-    <!-- Waves SVG -->
-    <svg class="waves" viewBox="0 0 1440 120" preserveAspectRatio="none" style="height:80px">
-        <path fill="rgba(0,212,255,0.05)" d="M0,60 C240,100 480,20 720,60 C960,100 1200,20 1440,60 L1440,120 L0,120 Z">
-            <animate attributeName="d" dur="6s" repeatCount="indefinite" values="M0,60 C240,100 480,20 720,60 C960,100 1200,20 1440,60 L1440,120 L0,120 Z;    M0,40 C240,80 480,40 720,40 C960,40 1200,80 1440,40 L1440,120 L0,120 Z;
-                    M0,60 C240,100 480,20 720,60 C960,100 1200,20 1440,60 L1440,120 L0,120 Z" />
-        </path>
-        <path fill="rgba(0,100,200,0.08)" d="M0,80 C360,40 720,100 1080,60 C1260,40 1380,80 1440,80 L1440,120 L0,120 Z">
-            <animate attributeName="d" dur="9s" repeatCount="indefinite" values="M0,80 C360,40 720,100 1080,60 C1260,40 1380,80 1440,80 L1440,120 L0,120 Z;
-                    M0,60 C360,90 720,50 1080,80 C1260,95 1380,55 1440,60 L1440,120 L0,120 Z;
-                    M0,80 C360,40 720,100 1080,60 C1260,40 1380,80 1440,80 L1440,120 L0,120 Z" />
-        </path>
-    </svg>
+<svg class="wave-svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <path fill="rgba(0,212,255,0.4)" d="M0,60 C360,120 1080,0 1440,60 L1440,120 L0,120 Z">
+        <animate attributeName="d" dur="6s" repeatCount="indefinite"
+            values="M0,60 C360,120 1080,0 1440,60 L1440,120 L0,120 Z;
+                    M0,40 C400,100 1040,20 1440,70 L1440,120 L0,120 Z;
+                    M0,60 C360,120 1080,0 1440,60 L1440,120 L0,120 Z"/>
+    </path>
+</svg>
 
-    <div class="container">
-        <header>
-            <div class="logo-wrap">
-                <div class="logo-text">MARINA SERVICE</div>
-            </div>
-            <div class="logo-line"></div>
-            <div class="sub-logo">BLUE HORIZON &nbsp;•&nbsp; DIVE TOURS &nbsp;•&nbsp; HOMA HOTEL</div>
-            <div class="header-badge">🌊 DIGITAL OPERATIONS 2026</div>
-        </header>
+<div class="container">
+    <header>
+        <div class="logo-ring">
+            <svg viewBox="0 0 90 90">
+                <circle cx="45" cy="45" r="40" fill="none" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+                <circle cx="45" cy="45" r="40" fill="none"
+                    stroke="url(#ringGrad)" stroke-width="1.5"
+                    stroke-dasharray="60 192" stroke-linecap="round"/>
+                <defs>
+                    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#00d4ff"/>
+                        <stop offset="100%" stop-color="#0077ff"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <div class="logo-ring-inner">🌊</div>
+        </div>
+        <h1 class="logo-text">MARINA SERVICE</h1>
+        <div class="sub-logo">BLUE HORIZON &nbsp;·&nbsp; HOMA HOTEL BANDAR ABBAS</div>
+        <div class="header-divider"></div>
+    </header>
 
-        <div id="main-accordion"></div>
+    <div id="task-list"></div>
 
-        <footer>&copy; 2026 BLUE HORIZON MARINA — DIGITAL OPERATIONS MANAGEMENT</footer>
-    </div>
+    <footer>
+        <div class="footer-line"></div>
+        DIGITAL OPERATIONS & MANAGEMENT SYSTEM © 2026
+    </footer>
+</div>
 
-    <script>
-        // Particles
-        const container = document.getElementById('particles');
-        for (let i = 0; i < 30; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            const size = Math.random() * 4 + 1;
-            p.style.cssText = `
-            width:${size}px; height:${size}px;
-            left:${Math.random() * 100}%;
-            animation-duration:${Math.random() * 15 + 8}s;
-            animation-delay:${Math.random() * 10}s;
-            opacity:${Math.random() * 0.5 + 0.1};
+<script>
+    /* ── PARTICLES ── */
+    const particleContainer = document.getElementById('particles');
+    for (let i = 0; i < 28; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 3 + 1;
+        const colors = ['rgba(0,212,255,', 'rgba(0,119,255,', 'rgba(0,255,204,'];
+        const col = colors[Math.floor(Math.random() * colors.length)];
+        p.style.cssText = `
+            left: ${Math.random() * 100}%;
+            width: ${size}px;
+            height: ${size}px;
+            background: ${col}${Math.random() * 0.6 + 0.2});
+            box-shadow: 0 0 ${size * 3}px ${col}0.8);
+            animation-duration: ${Math.random() * 15 + 12}s;
+            animation-delay: -${Math.random() * 20}s;
         `;
-            container.appendChild(p);
+        particleContainer.appendChild(p);
+    }
+
+    /* ── ACCORDION DATA ── */
+    const tasks = [
+        {
+            title: "طراحی و توسعه وب‌سایت",
+            icon: "🌐",
+            items: [
+                "طراحی پلتفرم اختصاصی رزرو آنلاین با درگاه پرداخت",
+                "پیاده‌سازی نسخه دوزبانه (فارسی/انگلیسی) برای توریست‌های خارجی",
+                "بهینه‌سازی سئو (SEO) جهت جذب مسافران بندرعباس از گوگل",
+                "بخش وبلاگ آموزشی (نکات غواصی و پدل‌بورد) جهت افزایش رتبه سایت"
+            ]
+        },
+        {
+            title: "ساخت سیستم هوشمند رزرو",
+            icon: "⚙️",
+            items: [
+                "اتصال تقویم کاری مربیان به فرم رزرو سایت",
+                "سیستم ارسال پیامک خودکار (Confirmation) برای مشتری",
+                "مدیریت ظرفیت پکیج‌های غواصی و تورهای دریایی هماهنگ با ظرفیت قایق",
+                "ایجاد پنل اختصاصی برای مشاهده لیست رزروهای روزانه و ماهانه"
+            ]
+        },
+        {
+            title: "مدیریت محتوا و ویترین آنلاین",
+            icon: "📸",
+            items: [
+                "هماهنگی با تیم فیلمبرداری زیر آب جهت تولید محتوای اکشن",
+                "تامین دیتای بصری برای ریلزها و پست‌های اینستاگرام",
+                "نظارت بر انتشار محتوای با کیفیت با حفظ هویت برند Blue Horizon",
+                "آپدیت منظم هایلایت‌های رضایت مشتری و قیمت‌های جدید"
+            ]
+        },
+        {
+            title: "مدیریت ارتباط با مشتری (CRM)",
+            icon: "💬",
+            items: [
+                "پاسخگویی حرفه‌ای به دایرکت‌ها، واتساپ و تماس‌های ورودی",
+                "مشاوره تخصصی غواصی، پدل‌بورد و یوگا بر اساس سطح تجربه مشتری",
+                "راهنمایی مشتریان مقیم در هتل هما جهت استفاده از خدمات مجموعه",
+                "پیگیری مشتریان قدیمی جهت بازگشت و استفاده مجدد از خدمات"
+            ]
+        },
+        {
+            title: "گزارش‌دهی و آنالیز داده‌ها",
+            icon: "📊",
+            items: [
+                "ارائه گزارش دقیق فروش هفتگی و ماهانه به تفکیک خدمات",
+                "تحلیل میزان رضایت مشتریان (NPS) و بهبود کیفیت سرویس‌دهی",
+                "پیشنهاد پکیج‌های جدید بر اساس ترندهای بازار و تقاضای گردشگران",
+                "بررسی عملکرد رقبا در نوار ساحلی بندرعباس و جزایر اطراف"
+            ]
         }
+    ];
 
-        const taskData = [
-            { title: "مدیریت ارتباط با مشتری", icon: "💬", items: ["پاسخگویی به پیام‌های اینستاگرام، واتساپ و تماس‌ها", "مشاوره تخصصی غواصی، پدل‌بورد و یوگا دریایی", "راهنمایی مشتری برای انتخاب پکیج مناسب", "مدیریت CRM و بانک اطلاعاتی مشتریان"] },
-            { title: "سیستم رزرو و پذیرش", icon: "📅", items: ["ثبت نهایی رزروها در سیستم دیجیتال", "کنترل ظرفیت قایق‌ها و تجهیزات غواصی", "ارسال تاییدیه و لوکیشن دقیق هتل هما برای مسافر", "هماهنگی ساعت دقیق حضور در ساحل"] },
-            { title: "هماهنگی عملیات دریایی", icon: "🌊", items: ["آنکال بودن مربیان برای تورهای روزانه", "چک لیست تعداد نفرات قبل از حرکت قایق", "انتقال درخواست‌های خاص مشتری به تیم فنی", "مدیریت زمان‌بندی یوگا روی پدل در طلوع/غروب"] },
-            { title: "مدیریت محتوا و ویترین آنلاین", icon: "📸", items: ["هماهنگی با تیم فیلمبرداری زیر آب", "تامین دیتای لازم برای پست‌ها و استوری‌ها", "نظارت بر انتشار محتوای با کیفیت از دفتر و ساحل", "آپدیت نگه داشتن هایلایت‌های رضایت مشتری"] },
-            { title: "توسعه بازار و تبلیغات", icon: "🚀", items: ["مدیریت کمپین‌های تبلیغاتی در پیج‌های هدف", "هماهنگی تورهای آشناسازی برای اینفلوئنسرها", "ارتباط با بخش گردشگری هتل هما برای پکیج‌های اقامتی", "گزارش بازگشت سرمایه تبلیغات"] },
-            { title: "گزارش‌دهی و آنالیز", icon: "📊", items: ["گزارش فروش هفتگی به مدیریت مجموعه", "تحلیل میزان رضایت مشتریان (NPS)", "پیشنهاد پکیج‌های جدید بر اساس تقاضای بازار", "بررسی عملکرد رقبا در منطقه بندرعباس"] }
-        ];
+    const listContainer = document.getElementById('task-list');
 
-        const acc = document.getElementById('main-accordion');
+    tasks.forEach((task, index) => {
+        const item = document.createElement('div');
+        item.className = 'accordion-item';
+        item.style.animationDelay = (index * 0.12) + 's';
 
-        taskData.forEach((data, i) => {
-            const item = document.createElement('div');
-            item.className = 'accordion-item';
-            item.style.animationDelay = (i * 0.12) + 's';
-            item.innerHTML = `
+        item.innerHTML = `
             <div class="accordion-header">
                 <div class="header-left">
-                    <div class="icon-wrap">${data.icon}</div>
-                    <span>${data.title}</span>
+                    <div class="icon-box">
+                        <div class="icon-box-inner">${task.icon}</div>
+                    </div>
+                    <div class="header-info">
+                        <div class="header-title">${task.title}</div>
+                        <div class="header-count">${task.items.length} مورد</div>
+                    </div>
                 </div>
-                <div class="arrow">▼</div>
+                <div class="arrow-wrap">
+                    <div class="arrow"></div>
+                </div>
             </div>
             <div class="accordion-content">
                 <div class="content-inner">
-                    <ul>${data.items.map(li => `<li><span class="li-dot"></span>${li}</li>`).join('')}</ul>
+                    <div class="progress-bar"><div class="progress-fill"></div></div>
+                    <div class="content-separator"></div>
+                    <ul>
+                        ${task.items.map((li, i) => `
+                            <li style="animation-delay:${0.1 + i * 0.07}s">
+                                <div class="li-dot"></div>
+                                <span>${li}</span>
+                            </li>`).join('')}
+                    </ul>
                 </div>
-            </div>`;
+            </div>
+        `;
 
-            item.querySelector('.accordion-header').addEventListener('click', () => {
-                const isActive = item.classList.contains('active');
-                document.querySelectorAll('.accordion-item').forEach(el => el.classList.remove('active'));
-                if (!isActive) item.classList.add('active');
-            });
-
-            acc.appendChild(item);
+        item.querySelector('.accordion-header').addEventListener('click', () => {
+            const wasActive = item.classList.contains('active');
+            document.querySelectorAll('.accordion-item').forEach(el => el.classList.remove('active'));
+            if (!wasActive) item.classList.add('active');
         });
-    </script>
-</body>
 
+        listContainer.appendChild(item);
+    });
+</script>
+</body>
 </html>
